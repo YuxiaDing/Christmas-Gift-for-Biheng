@@ -23,23 +23,17 @@ const App: React.FC = () => {
     }, 500);
   };
 
-  // Handle the auto-close / finish logic
+  // Handle the finish logic
   useEffect(() => {
     if (stage === Stage.CELEBRATING) {
       // Show the celebration for 8 seconds, then fade out
       const timer = setTimeout(() => {
         setFadeBlack(true);
         setTimeout(() => {
-            setStage(Stage.FINISHED);
-            // Attempt to close window (often blocked by browsers, but worth a try)
-            try {
-                window.close();
-            } catch (e) {
-                console.log("Auto-close blocked by browser");
-            }
+          setStage(Stage.FINISHED);
+          // 这里删除了 window.close()，让它停留在最后的画面
         }, 2000); // 2 seconds for fade to black effect
-      }, 8000); 
-
+      }, 8000);
       return () => clearTimeout(timer);
     }
   }, [stage]);
@@ -47,25 +41,33 @@ const App: React.FC = () => {
   // Render the "The End" screen
   if (stage === Stage.FINISHED) {
     return (
-      <div className="h-screen w-screen bg-black flex items-center justify-center text-gray-500 font-light tracking-widest">
-         ❤️ 
+      <div className="h-screen w-screen bg-black flex flex-col items-center justify-center text-white font-light tracking-widest">
+        {/* 👇👇👇 这里是关键修改 👇👇👇 */}
+        {/* 把 text-gray-500 改成了 text-red-500 (红心) */}
+        {/* 加了 text-6xl (变大) 和 animate-pulse (心跳动画) */}
+        <div className="text-6xl text-red-500 animate-pulse mb-4">
+          ❤️
+        </div>
+        <div className="opacity-80 text-xl font-handwriting">
+          Merry Christmas, Biheng!
+        </div>
       </div>
-    );
+    )
   }
 
   return (
     <div className={`relative h-screen w-screen bg-gradient-to-b from-slate-900 to-slate-800 overflow-hidden transition-opacity duration-2000 ${fadeBlack ? 'opacity-0' : 'opacity-100'}`}>
       {/* Background Elements */}
       <Snowfall />
-      
+
       {/* Content Layer */}
       <div className="absolute inset-0 flex items-center justify-center p-4">
         {stage === Stage.INITIAL && (
-            <GiftBox onOpen={handleOpenGift} />
+          <GiftBox onOpen={handleOpenGift} />
         )}
-        
+
         {stage === Stage.CELEBRATING && (
-            <Celebration />
+          <Celebration />
         )}
       </div>
 
